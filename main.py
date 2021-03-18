@@ -6,11 +6,13 @@ import pandas as pd
 
 
 def search_for_R(R_name):
-    #html = urlopen("https://www.tripadvisor.com/Search?q="+R_name)
-    page=requests.get("https://www.tripadvisor.com/"+R_name)
-    print(page.text)
-#search_for_R("majid")
-#html_soup = BeautifulSoup(html, 'html.parser')
+    html = urlopen("https://www.tripadvisor.com/Search?q="+R_name)
+    html_soup = BeautifulSoup(html, 'html.parser')
+    link = html_soup.find_all(class_="rebrand_2017 js_logging desktop_web Search")
+    print(link)
+    
+search_for_R("majid")
+
 #page=requests.get("https://www.tripadvisor.com/")
 #print(page.text)
 
