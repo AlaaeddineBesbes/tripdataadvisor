@@ -2,7 +2,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
-import pandas as pd
 import csv
 import tkinter as tk
 from tkinter.ttk import *
@@ -20,6 +19,7 @@ csvRWriter = csv.writer(csvRestaurant_data)
 
 def show_entry_fields():
     print("Le lien est : %s" % (e1.get()))
+    # fonction qui retourne tous les users qui ont fait des reviews
     def search_for_R(R_link):
         users_name=[]
         html = urlopen(R_link)
@@ -29,11 +29,14 @@ def show_entry_fields():
             text= str(i)[106:]
             text=text.replace('</div></div>','')
             users_name.append(text)
+            print(text)
         cond=users_name[0]
         c=1
         index = R_link.find('Reviews')
-        R_link = R_link[:index+7] + str(c*10) + R_link[index+7:]
+        R_link = R_link[:index+7] +"-or"+ str(c*10)+"-" + R_link[index+7:]
+
         while True:
+            R_link = R_link[:index+7] +"-or"+ str(c*10)+"-" + R_link[index+7:]
             html = urlopen(R_link)
             html_soup = BeautifulSoup(html, 'html.parser')
             div= html_soup.findAll("div",{"class":"info_text pointer_cursor"})
@@ -43,8 +46,9 @@ def show_entry_fields():
                 if text == cond:
                     return users_name
                 users_name.append(text)
+                print(text)
             c=c+1
-
+    # fonction qui retourne les reviews faites par un user
     def user_info(user_name):
         if " " in user_name:
             return ["can't determine username ","can't determine location ","can't determine username reviews"]
@@ -59,16 +63,20 @@ def show_entry_fields():
             rev=str(i)[43:]
             rev=rev[:-10]
             user_reviews.append(rev)
+        print("searching for reviwes done by ",user_name)
         return [user_name,location,user_reviews]
 
     users_name = search_for_R(str(e1.get()))
-
+    #
+    l=len(users_name)
     for name in users_name:
+        csvRWriter.writerow([str(name).encode('utf8')])
         us_in=user_info(name)
-        csvUWriter.writerow([us_in[0],us_in[1],str(us_in[2]).encode('utf8')])
+        users_name.remove(name)
+        print(l-len(users_name),"/",l,"done")
+        csvUWriter.writerow([us_in[0].encode('utf8'),us_in[1],str(us_in[2]).encode('utf8')])
         
-    for i in users_name:
-        csvRWriter.writerow([i])
+    
 
 
 interface = tk.Tk()
